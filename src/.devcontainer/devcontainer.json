@@ -1,11 +1,11 @@
 {
     "name": "ROS 2 Development Container",
     "privileged": true,
-    "remoteUser": "geibinger",
+    "remoteUser": "roboost",
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            "USERNAME": "geibinger"
+            "USERNAME": "roboost"
         }
     },
     "workspaceFolder": "/home/ws",
@@ -38,5 +38,5 @@
         "source=${localWorkspaceFolder}/../cache/humble/install,target=/home/ws/install,type=bind",
         "source=${localWorkspaceFolder}/../cache/humble/log,target=/home/ws/log,type=bind"
     ],
-    "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R geibinger /home/ws/"
+    "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R roboost /home/ws/"
 }
