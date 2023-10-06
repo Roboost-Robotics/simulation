@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="roboost_mecanum_robot">
 
-    <xacro:include filename="res/roboost_materials.xacro"/>
+    <xacro:include filename="roboost_materials.xacro"/>
 
     <!-- TODO: determine values -->
     <xacro:property name="chassis_length" value="0.42"/>
