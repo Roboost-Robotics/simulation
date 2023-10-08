@@ -32,6 +32,18 @@ def generate_launch_description():
                     {
                         "use_sim_time": use_sim_time,
                         "robot_description": Command(["xacro", " ", urdf]),
+                        "ignore_timestamp": "true", # TODO: Is this necessary?
+                    }
+                ],
+            ),
+            Node(
+                package="joint_state_publisher_gui", # TODO: Is this necessary?
+                executable="joint_state_publisher_gui",
+                name="joint_state_publisher_gui",
+                output="screen",
+                parameters=[
+                    {
+                        "use_sim_time": use_sim_time
                     }
                 ],
             ),
