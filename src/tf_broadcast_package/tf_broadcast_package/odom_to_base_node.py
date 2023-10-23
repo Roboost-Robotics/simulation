@@ -5,24 +5,19 @@ from nav_msgs.msg import Odometry
 import tf2_ros
 import tf2_geometry_msgs
 
-class OdomToBaseLinkTfNode(Node):
 
+class OdomToBaseLinkTfNode(Node):
     def __init__(self):
-        super().__init__('odom_to_base_link_tf_node')
+        super().__init__("odom_to_base_link_tf_node")
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
 
-        self.create_subscription(
-            Odometry,
-            '/odom',
-            self.odom_callback,
-            10
-        )
+        self.create_subscription(Odometry, "/odom/wheel_odom", self.odom_callback, 10)
 
     def odom_callback(self, msg):
         transform_stamped = TransformStamped()
-        transform_stamped.header.stamp = self.get_clock().now().to_msg() # TODO: Change timestamp to timestamp of message
-        transform_stamped.header.frame_id = 'odom'
-        transform_stamped.child_frame_id = 'base_link'
+        transform_stamped.header.stamp = msg.header.stamp
+        transform_stamped.header.frame_id = "odom"
+        transform_stamped.child_frame_id = "base_link"
 
         transform_stamped.transform.translation.x = msg.pose.pose.position.x
         transform_stamped.transform.translation.y = msg.pose.pose.position.y
@@ -32,6 +27,7 @@ class OdomToBaseLinkTfNode(Node):
 
         self.tf_broadcaster.sendTransform(transform_stamped)
 
+
 def main(args=None):
     rclpy.init(args=args)
     odom_to_base_link_tf_node = OdomToBaseLinkTfNode()
@@ -39,5 +35,6 @@ def main(args=None):
     odom_to_base_link_tf_node.destroy_node()
     rclpy.shutdown()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
