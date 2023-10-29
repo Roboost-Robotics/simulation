@@ -6,28 +6,27 @@
     <!-- TODO: determine values -->
     <xacro:property name="chassis_length" value="0.42"/>
     <xacro:property name="chassis_width" value="0.28"/>
-    <xacro:property name="chassis_height" value="0.14"/>
+    <xacro:property name="chassis_height" value="0.108"/> <!-- ! Measured from wheel axis to top plate -->
     <xacro:property name="chassis_mass" value="20.0"/>
     <xacro:property name="chassis_inertia" value="4.0"/>
 
-    <xacro:property name="wheel_radius" value="0.075"/>
+    <xacro:property name="wheel_radius" value="0.0835"/>
     <xacro:property name="wheel_width" value="0.05"/>
     <xacro:property name="wheel_mass" value="1.0"/>
     <xacro:property name="wheel_inertia" value="0.1"/>
 
-    <xacro:property name="wheelbase" value="0.38"/>
-    <xacro:property name="track" value="0.32"/>
+    <xacro:property name="lidar_height" value="0.0575"/>
 
-    
-    <!--link name="world"></link-->
+    <xacro:property name="wheelbase" value="0.3185"/>
+    <xacro:property name="track" value="0.38"/>
 
     <link name="base_link">
         <visual>
             <geometry>
-                <mesh filename="file:///home/geibinger/Projects/Roboost/Roboost-Cerebrum/src/tf_broadcast_package/meshes/Chassis.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find tf_broadcast_package)/meshes/Chassis.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
-            <origin xyz="0 0 0.05" rpy="${pi / 2} 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="${pi / 2} 0.0 0.0"/>
 
             <material name="orange"/>
         </visual>
@@ -49,10 +48,10 @@
         <visual>
             <geometry>
                 <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
-                <mesh filename="file:///home/geibinger/Projects/Roboost/Roboost-Cerebrum/src/tf_broadcast_package/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="-${wheel_radius} ${wheel_radius} ${wheel_width}" rpy="${pi} 0.0 0.0"/>
 
             <material name="grey"/>
         </visual>
@@ -61,7 +60,7 @@
                 <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         </collision>
         <inertial>
             <mass value="1.0"/>
@@ -73,10 +72,11 @@
     <link name="wheel_front_right_link">
         <visual>
             <geometry>
-                <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
+                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Right.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 
             <material name="grey"/>
         </visual>
@@ -85,7 +85,7 @@
                 <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         </collision>
         <inertial>
             <mass value="1.0"/>
@@ -97,10 +97,11 @@
     <link name="wheel_back_left_link">
         <visual>
             <geometry>
-                <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
+                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="-${wheel_radius} ${wheel_radius} ${wheel_width}" rpy="${pi} 0.0 0.0"/>
 
             <material name="grey"/>
         </visual>
@@ -109,7 +110,7 @@
                 <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         </collision>
         <inertial>
             <mass value="1.0"/>
@@ -121,10 +122,11 @@
     <link name="wheel_back_right_link">
         <visual>
             <geometry>
-                <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
+                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Right.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 
             <material name="grey"/>
         </visual>
@@ -133,11 +135,11 @@
                 <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         </collision>
         <inertial>
             <mass value="1.0"/>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.03" rpy="0.0 0.0 0.0"/>
             <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
         </inertial>
     </link>
@@ -145,10 +147,10 @@
     <link name="lidar_link">
         <visual>
             <geometry>
-                <cylinder radius="0.05" length="0.05"/>
+                <mesh filename="file://$(find tf_broadcast_package)/meshes/RP-LiDAR.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <origin xyz="0.0 0.0 0.042" rpy="-${pi / 2} 0.0 ${pi}"/>
 
             <material name="red"/>
         </visual>
@@ -215,12 +217,6 @@
         </inertial>
     </link>
 
-    <!--joint name="world_to_chassis_joint" type="fixed">
-        <parent link="world"/>
-        <child link="base_link"/>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
-    </joint-->
-
     <joint name="wheel_front_left_joint" type="continuous">
         <parent link="base_link"/>
         <child link="wheel_front_left_link"/>
@@ -256,7 +252,7 @@
     <joint name="lidar_joint" type="fixed">
         <parent link="base_link"/>
         <child link="lidar_link"/>
-        <origin xyz="0.0 -0.05 ${chassis_height}" rpy="${pi} 0.0 ${pi * 3 / 2}"/>
+        <origin xyz="0.062 0.05 ${chassis_height + lidar_height}" rpy="${pi} 0.0 ${pi * 3/ 2}"/>
     </joint>
 
     <joint name="camera_joint" type="fixed">
