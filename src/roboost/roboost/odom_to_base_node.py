@@ -11,11 +11,11 @@ class OdomToBaseLinkTfNode(Node):
         super().__init__("odom_to_base_link_tf_node")
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
 
-        self.create_subscription(Odometry, "/odom/wheel_odom", self.odom_callback, 10)
+        self.create_subscription(Odometry, "/odom", self.odom_callback, 10)
 
     def odom_callback(self, msg):
         transform_stamped = TransformStamped()
-        transform_stamped.header.stamp = msg.header.stamp
+        transform_stamped.header.stamp = self.get_clock().now().to_msg()
         transform_stamped.header.frame_id = "odom"
         transform_stamped.child_frame_id = "base_link"
 

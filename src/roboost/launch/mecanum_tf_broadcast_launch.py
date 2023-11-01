@@ -12,9 +12,7 @@ def generate_launch_description():
 
     print("urdf_file_name : {}".format(urdf_file_name))
 
-    urdf = os.path.join(
-        get_package_share_directory("tf_broadcast_package"), urdf_file_name
-    )
+    urdf = os.path.join(get_package_share_directory("roboost"), urdf_file_name)
 
     return LaunchDescription(
         [
@@ -36,7 +34,7 @@ def generate_launch_description():
                 ],
             ),
             Node(
-                package="tf_broadcast_package",
+                package="roboost",
                 executable="odom_to_base_node",
                 name="odom_to_base_node",
                 output="screen",

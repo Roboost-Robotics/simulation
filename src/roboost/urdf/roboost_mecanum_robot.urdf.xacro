@@ -10,7 +10,7 @@
     <xacro:property name="chassis_mass" value="20.0"/>
     <xacro:property name="chassis_inertia" value="4.0"/>
 
-    <xacro:property name="wheel_radius" value="0.0835"/>
+    <xacro:property name="wheel_radius" value="0.075"/> <!-- ! This is only the wheel redius for the simulated robot. Actual Radius might differ-->
     <xacro:property name="wheel_width" value="0.05"/>
     <xacro:property name="wheel_mass" value="1.0"/>
     <xacro:property name="wheel_inertia" value="0.1"/>
@@ -21,9 +21,15 @@
     <xacro:property name="track" value="0.38"/>
 
     <link name="base_link">
+    </link>
+
+    <link name="base_footprint">
+    </link>
+
+    <link name="chassis_link">
         <visual>
             <geometry>
-                <mesh filename="file://$(find tf_broadcast_package)/meshes/Chassis.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find roboost)/meshes/Chassis.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
             <origin xyz="0.0 0.0 0.0" rpy="${pi / 2} 0.0 0.0"/>
@@ -48,7 +54,7 @@
         <visual>
             <geometry>
                 <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
-                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find roboost)/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
@@ -73,7 +79,7 @@
         <visual>
             <geometry>
                 <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
-                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Right.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find roboost)/meshes/Mecanum-Wheel-Right.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
@@ -98,7 +104,7 @@
         <visual>
             <geometry>
                 <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
-                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find roboost)/meshes/Mecanum-Wheel-Left.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
@@ -122,8 +128,7 @@
     <link name="wheel_back_right_link">
         <visual>
             <geometry>
-                <!--cylinder radius="${wheel_radius}" length="${wheel_width}"/-->
-                <mesh filename="file://$(find tf_broadcast_package)/meshes/Mecanum-Wheel-Right.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find roboost)/meshes/Mecanum-Wheel-Right.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
@@ -147,7 +152,7 @@
     <link name="lidar_link">
         <visual>
             <geometry>
-                <mesh filename="file://$(find tf_broadcast_package)/meshes/RP-LiDAR.STL" scale="0.001 0.001 0.001"/>
+                <mesh filename="file://$(find roboost)/meshes/RP-LiDAR.STL" scale="0.001 0.001 0.001"/>
             </geometry>
 
             <origin xyz="0.0 0.0 0.042" rpy="-${pi / 2} 0.0 ${pi}"/>
@@ -193,7 +198,7 @@
         </inertial>
     </link>
 
-    <link name="imu">
+    <link name="imu_link">
         <visual>
             <geometry>
                 <box size="0.02 0.02 0.01"/>
@@ -217,8 +222,20 @@
         </inertial>
     </link>
 
-    <joint name="wheel_front_left_joint" type="continuous">
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="base_link"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </joint>
+
+    <joint name="chassis_joint" type="fixed">
         <parent link="base_link"/>
+        <child link="chassis_link"/>
+        <origin xyz="0.0 0.0 ${wheel_radius}" rpy="0.0 0.0 0.0"/>
+    </joint>
+
+    <joint name="wheel_front_left_joint" type="continuous">
+        <parent link="chassis_link"/>
         <child link="wheel_front_left_link"/>
         <origin xyz="${wheelbase / 2} ${track / 2} 0.0" rpy="${pi * 3 / 2} 0.0 0.0"/>
         <axis xyz="0.0 0.0 1.0"/>
@@ -226,7 +243,7 @@
     </joint>
 
     <joint name="wheel_front_right_joint" type="continuous">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="wheel_front_right_link"/>
         <origin xyz="${wheelbase / 2} -${track / 2} 0.0" rpy="${pi / 2} 0.0 0.0"/>
         <axis xyz="0.0 0.0 1.0"/>
@@ -234,7 +251,7 @@
     </joint>
 
     <joint name="wheel_back_left_joint" type="continuous">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="wheel_back_left_link"/>
         <origin xyz="-${wheelbase / 2} ${track / 2} 0.0" rpy="${pi * 3 / 2} 0.0 0.0"/>
         <axis xyz="0.0 0.0 1.0"/>
@@ -242,7 +259,7 @@
     </joint>
 
     <joint name="wheel_back_right_joint" type="continuous">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="wheel_back_right_link"/>
         <origin xyz="-${wheelbase / 2} -${track / 2} 0.0" rpy="${pi / 2} 0.0 0.0"/>
         <axis xyz="0.0 0.0 1.0"/>
@@ -250,20 +267,20 @@
     </joint>
 
     <joint name="lidar_joint" type="fixed">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="lidar_link"/>
         <origin xyz="0.062 0.05 ${chassis_height + lidar_height}" rpy="${pi} 0.0 ${pi * 3/ 2}"/>
     </joint>
 
     <joint name="camera_joint" type="fixed">
-        <parent link="base_link"/>
+        <parent link="chassis_link"/>
         <child link="camera_link"/>
         <origin xyz="${-chassis_length / 2} 0.08 ${chassis_height -0.05}" rpy="0.0 ${pi * 3 / 2} 0.0"/>
     </joint>
 
     <joint name="imu_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="imu"/>
+        <parent link="chassis_link"/>
+        <child link="imu_link"/>
         <origin xyz="${-chassis_length / 2 + 0.05} 0.08 ${chassis_height -0.015}" rpy="0.0 0.0 0.0"/>
     </joint>
 </robot>
