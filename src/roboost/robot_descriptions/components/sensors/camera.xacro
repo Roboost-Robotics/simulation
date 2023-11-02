@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="camera" params="name parent *origin">
+        <link name="${name}_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="0.01" length="0.02"/>
+                    <box size="0.02 0.02 0.01"/>
+                </geometry>
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                <material name="purple"/>
+            </visual>
+        </link>
+        <gazebo reference="${name}_link">
+            <material>Gazebo/Purple</material>
+        </gazebo>
+        <joint name="${name}_joint" type="fixed">
+            <parent link="${parent}"/>
+            <child link="${name}_link"/>
+            <xacro:insert_block name="origin"/>
+        </joint>
+    </xacro:macro>
+</robot>

@@ -1,25 +1,43 @@
 import os
 from glob import glob
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import setup, find_packages
 
 package_name = "roboost"
+
+
+# Function to create the proper data_files structure
+def package_files(directory):
+    paths = []
+    for path, directories, filenames in os.walk(directory):
+        for filename in filenames:
+            paths.append(
+                (
+                    os.path.join("share", package_name, path),
+                    [os.path.join(path, filename)],
+                )
+            )
+    return paths
+
+
+# List of all the directories to include
+directories = ["launch", "robot_descriptions", "config", "meshes"]
+
+# Creating the data files list
+data_files = [
+    (
+        os.path.join("share", "ament_index", "resource_index", "packages"),
+        [os.path.join("resource", package_name)],
+    ),
+    (os.path.join("share", package_name), ["package.xml"]),
+]
+for directory in directories:
+    data_files.extend(package_files(directory))
 
 setup(
     name=package_name,
     version="0.0.0",
     packages=find_packages(exclude=["test"]),
-    data_files=[
-        (
-            os.path.join("share", "ament_index", "resource_index", "packages"),
-            [os.path.join("resource", package_name)],
-        ),
-        (os.path.join("share", package_name), ["package.xml"]),
-        (os.path.join("share", package_name), glob("launch/**.py")),
-        (os.path.join("share", package_name), glob("urdf/*")),
-        (os.path.join("share", package_name, "config"), glob("config/*")),
-        (os.path.join("share", package_name, "meshes"), glob("meshes/*")),
-    ],
+    data_files=data_files,
     install_requires=["setuptools"],
     zip_safe=True,
     maintainer="geibinger",

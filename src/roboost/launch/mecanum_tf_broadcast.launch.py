@@ -8,11 +8,15 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time", default="false")
-    urdf_file_name = "roboost_mecanum_robot.urdf.xacro"
+    # urdf_file_name = "roboost_mecanum_robot.urdf.xacro"
+    urdf_file_name = "mecanum_robot.urdf.xacro"
 
-    print("urdf_file_name : {}".format(urdf_file_name))
-
-    urdf = os.path.join(get_package_share_directory("roboost"), urdf_file_name)
+    urdf = os.path.join(
+        get_package_share_directory("roboost"),
+        "robot_descriptions",
+        "robots",
+        urdf_file_name,
+    )
 
     return LaunchDescription(
         [
