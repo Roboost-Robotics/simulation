@@ -55,11 +55,11 @@
     </xacro:lidar>
 
     <xacro:camera name="camera_sensor" parent="chassis_link">
-        <origin xyz="${-chassis_length / 2} 0.08 ${chassis_height -0.05}" rpy="0.0 ${pi * 3 / 2} 0.0"/>
+        <origin xyz="${chassis_length / 2 - 0.03} -0.08 ${chassis_height - 0.035}" rpy="0.0 0.0 0.0"/>
     </xacro:camera>
 
     <xacro:imu name="imu_sensor" parent="chassis_link">
-        <origin xyz="${-chassis_length / 2 + 0.05} 0.08 ${chassis_height -0.015}" rpy="0.0 0.0 0.0"/>
+        <origin xyz="${chassis_length / 2 - 0.05} -0.08 ${chassis_height}" rpy="0.0 0.0 0.0"/>
     </xacro:imu>
 
 

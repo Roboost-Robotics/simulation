@@ -9,23 +9,21 @@ def generate_launch_description():
         get_package_share_directory("roboost"), "config", "joystick.yaml"
     )
 
-    print("joy_params: {}".format(joy_params))
+    joy_node = Node(
+        package="joy",
+        executable="joy_node",
+    )
 
-    # Print the joy_params file to the console
-    with open(joy_params, "r") as f:
-        print(f.read())
-
-    # close the file
-    f.close()
+    teleop_node = Node(
+        package="teleop_twist_joy",
+        executable="teleop_node",
+        name="teleop_node",
+        parameters=[joy_params],
+    )
 
     return LaunchDescription(
         [
-            Node(package="joy", executable="joy_node"),
-            Node(
-                package="teleop_twist_joy",
-                executable="teleop_node",
-                name="teleop_node",
-                parameters=[joy_params],
-            ),
+            joy_node,
+            teleop_node,
         ]
     )
