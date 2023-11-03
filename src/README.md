@@ -23,7 +23,7 @@ source install/local_setup.bash
 
 ## Packages
 
-### tf_broadcast_package
+### roboost
 
 This package is used to broadcast the tf tree of the robot. This includes the URDF file and the odom frame in the case of the Roboost Mecanum robot.
 
@@ -33,4 +33,28 @@ To launch the package, run the following command:
 
 ```bash
 ros2 launch tf_broadcast_package mecanum_tf_broadcast_launch.py
+```
+
+### yolov8_ros
+
+#### Test Usage
+
+To launch the package, run the following commands:
+
+For the camera stream:
+
+```bash
+ros2 launch roboost camera.launch.py
+```
+
+For the yolov8 node:
+
+```bash
+ros2 launch yolov8_bringup yolov8.launch.py device:=cpu input_image_topic:=/image_raw
+```
+
+For rqt image view:
+
+```bash
+ros2 run rqt_image_view rqt_image_view
 ```
