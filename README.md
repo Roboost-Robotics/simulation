@@ -13,6 +13,14 @@ This repository, a crucial segment of the Roboost project, hosts high-level func
 
 The Cerebrum repository incorporates ROS2 packages essential for the operation and control of the Roboost robot. These packages integrate to manage navigation, vision processing, and other more advanced functionalities.
 
+Here you can see the simulated robot in Gazebo:
+
+![Simulated robot in Gazebo](./res/mecanum_sim.png)
+
+And here the integration with slam-toolbox:
+
+![SLAM mapping](./res/slam_toolbox_integration.png)
+
 ## Packages
 
 ### roboost
