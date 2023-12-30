@@ -94,9 +94,26 @@ TODO: Add more detailed instructions, including config and launch files.
 
 ### Building and Deployment
 
-1. Clone the repository.
-2. Open in VSCode.
-3. Use Docker for building and deployment (refer to repository for detailed steps).
+- Clone the repository.
+- Open in VSCode.
+- Use Docker for building and deployment:
+  - Build the Docker image:
+```bash
+docker build -t roboost-cerebrum .
+```
+  - Run a container from the image:
+```bash
+docker run -it --rm --name cerebrum_container roboost-cerebrum
+```
+
+  - Inside the container, navigate to the workspace and build the ROS2 packages:
+
+```bash
+colcon build
+source install/setup.bash
+```
+
+Launch the desired ROS2 nodes using the launch files provided in the documentation.
 
 ## Usage
 
