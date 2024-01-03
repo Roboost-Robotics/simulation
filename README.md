@@ -115,38 +115,24 @@ source install/setup.bash
 
 Launch the desired ROS2 nodes using the launch files provided in the documentation.
 
-## Usage
+## Usage with Roboost-Mecanum Robot
 
-Control and monitor the robot via ROS2 commands. Specific instructions in each package's documentation.
+### Start Micro-ROS Agent
+
+```bash
+docker run --rm -it --device=/dev/ttyUSB0 --net=host microros/micro-ros-agent:humble serial --dev /dev/ttyUSB0
+```
+
+or for multiple devices:
+
+```bash
+sudo docker run -it --rm -v /dev:/dev --privileged --net=host microros/micro-ros-agent:humble multiserial --devs "/dev/ttyUSB0 /dev/ttyUSB1"
+```
+
+The agent should now be running and waiting for a client to connect. Now, the other nodes can be launched as usual.
 
 ## Additional Components (Planned)
 
 - ChatGPT integration
 - Speech recognition and synthesis
 - NAV2 stack implementation
-
----
-
-# Roboost Cortex - Packages
-
-Informed by resources like [Articulated Robotics](https://www.youtube.com/watch?v=CwdbsvcpOHM&ab_channel=ArticulatedRobotics), this section covers the installation and usage of various packages.
-
-## Installation
-
-In the workspace root:
-
-```bash
-rosdep install -i --from-path src --rosdistro humble -y
-colcon build
-source install/local_setup.bash
-```
-
-## Packages Overview
-
-Refer to the above sections for detailed package descriptions and usage instructions.
-
-## Future Enhancements
-
-- MoveIt implementation.
-- Vision stack expansion.
-- Additional documentation.
