@@ -92,3 +92,31 @@ To start mapping, launch the slam toolbox using the provided config:
 ```bash
 ros2 launch slam_toolbox online_async_launch.py params_file:=./src/roboost/config/mapper_params_online_async.yaml
 ```
+
+### Running AMCL and SLAM Toolbox
+
+To use AMCL and SLAM Toolbox with Roboost Cortex, follow these steps:
+
+#### On the Robot:
+
+```bash
+sudo docker run -it -v /dev:/dev --privileged --net=host microros/micro-ros-agent:humble multiserial --devs "/dev/ttyUSB0 /dev/ttyUSB1"
+
+ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=./src/roboost/maps/home_map.yaml
+
+ros2 launch slam_toolbox online_async_launch.py params_file:=./src/roboost/config/mapper_params_online_async.yaml
+
+ros2 run twist_mux twist_mux --ros-args --params-file ./src/roboost/config/twist_mux.yaml -r cmd_vel_out:=mecanum_cont/cmd_vel_unstamped
+
+ros2 launch nav2_bringup navigation_launch.py
+```
+
+#### On the PC:
+
+```bash
+ros2 launch roboost mecanum_tf_broadcast.launch.py
+
+rviz2
+
+ros2 launch roboost joy_control.launch.py
+```
