@@ -46,6 +46,9 @@ setup(
     license="Apache License 2.0",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["odom_to_base_node = roboost.odom_to_base_node:main"],
+        "console_scripts": [
+            "odom_to_base_node = roboost.odom_to_base_node:main",
+            "camera_publisher = roboost.camera_publisher_node:main",
+        ],
     },
 )
