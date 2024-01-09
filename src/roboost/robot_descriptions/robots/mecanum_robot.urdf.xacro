@@ -51,7 +51,7 @@
 
     <!-- Sensors -->
     <xacro:lidar name="lidar" parent="chassis_link">
-        <origin xyz="0.062 0.05 ${chassis_height + lidar_height}" rpy="${pi} 0.0 ${pi * 3/ 2}"/>
+        <origin xyz="0.057 0.045 ${chassis_height + lidar_height}" rpy="${pi} 0.0 ${pi * 3/ 2}"/>
     </xacro:lidar>
 
     <xacro:camera name="camera" parent="chassis_link">
