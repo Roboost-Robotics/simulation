@@ -20,7 +20,7 @@ def package_files(directory):
 
 
 # List of all the directories to include
-directories = ["launch", "robot_descriptions", "config", "meshes"]
+directories = ["launch", "robot_descriptions", "config", "meshes", "audio"]
 
 # Creating the data files list
 data_files = [
@@ -47,8 +47,9 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "odom_to_base_node = roboost.odom_to_base_node:main",
+            "odom_to_base = roboost.odom_to_base_node:main",
             "camera_publisher = roboost.camera_publisher_node:main",
+            "audio_player = roboost.audio_player_node:main",
         ],
     },
 )

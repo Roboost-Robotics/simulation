@@ -23,6 +23,9 @@ class CameraPublisher(Node):
     def timer_callback(self):
         ret, frame = self.cap.read()
         if ret:
+            # Resize the frame to a lower resolution, e.g., 640x480
+            frame = cv2.resize(frame, (640, 480))
+
             frame = cv2.rotate(frame, cv2.ROTATE_180)
             msg = self.bridge.cv2_to_imgmsg(frame, "bgr8")
 
