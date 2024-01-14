@@ -1,0 +1,21 @@
+db_config:
+  host: "192.168.0.17"
+  port: "5432"
+  dbname: "your_db_name"
+  user: "your_username"
+  password: "your_password"
+
+topics:
+  /topic1: 
+    msg_type: "std_msgs.msg.String"
+    table_structure:
+      - column_name: "data"
+        column_type: "TEXT"
+  /topic2: 
+    msg_type: "sensor_msgs.msg.Image"
+    table_structure:
+      - column_name: "format"
+        column_type: "VARCHAR(10)"
+      - column_name: "data"
+        column_type: "BYTEA"
+        

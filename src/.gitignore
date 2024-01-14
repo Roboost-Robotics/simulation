@@ -3,3 +3,5 @@ ros_tutorials
 Doxyfile
 
 __pycache__/
+
+*.ogg
