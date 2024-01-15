@@ -50,6 +50,7 @@ setup(
             "odom_to_base = roboost.odom_to_base_node:main",
             "camera_publisher = roboost.camera_publisher_node:main",
             "audio_player = roboost.audio_player_node:main",
+            "timescale_connector = roboost.timescale_connector_node:main",
         ],
     },
 )

@@ -1,8 +1,10 @@
+import os
 import rclpy
 from rclpy.node import Node
 import yaml
 import psycopg2
 from psycopg2 import sql
+from ament_index_python import get_package_share_directory
 
 
 class TimescaleDBLogger(Node):
@@ -13,7 +15,9 @@ class TimescaleDBLogger(Node):
         self.create_subscriptions()
 
     def read_config(self):
-        with open("config.yaml", "r") as file:
+        package_share_directory = get_package_share_directory("roboost")
+        conf_file = os.path.join(package_share_directory, "config", "timescale.yaml")
+        with open(conf_file, "r") as file:
             config = yaml.safe_load(file)
         self.db_config = config["db_config"]
         self.topics = config["topics"]
@@ -33,6 +37,13 @@ class TimescaleDBLogger(Node):
             module_name, class_name = topic_config["msg_type"].rsplit(".", 1)
             module = __import__(module_name, fromlist=[class_name])
             msg_class = getattr(module, class_name)
+
+            # Create the table for the topic if it doesn't exist
+            table_name = topic.replace("/", "_").lstrip("_")
+            if "table_structure" in topic_config:
+                self.create_table_if_not_exists(
+                    table_name, topic_config["table_structure"]
+                )
 
             self.create_subscription(
                 msg_class,
