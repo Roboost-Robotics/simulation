@@ -93,33 +93,54 @@ To start mapping, launch the slam toolbox using the provided config:
 ros2 launch slam_toolbox online_async_launch.py params_file:=./src/roboost/config/mapper_params_online_async.yaml
 ```
 
-### Running AMCL and SLAM Toolbox
+### Workflow
 
 To use AMCL and SLAM Toolbox with Roboost Cortex, follow these steps:
 
-#### On the Robot
+For demonstration purposes, we will use the mecanum_sim.launch.py file to launch the robot in Gazebo. This will also launch the mecanum_tf_broadcast.
 
 ```bash
-sudo docker run -it -v /dev:/dev --privileged --net=host microros/micro-ros-agent:humble multiserial --devs "/dev/ttyUSB0 /dev/ttyUSB1"
-
-ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=./src/roboost/maps/home_map.yaml
-
-ros2 launch slam_toolbox online_async_launch.py params_file:=./src/roboost/config/mapper_params_online_async.yaml
-
-ros2 run twist_mux twist_mux --ros-args --params-file ./src/roboost/config/twist_mux.yaml -r cmd_vel_out:=mecanum_cont/cmd_vel_unstamped
-
-ros2 launch nav2_bringup navigation_launch.py map:=./src/roboost/maps/home_map.yaml
+ros2 launch roboost mecanum_sim.launch.py world:=src/roboost/worlds/home.world
 ```
 
-#### On the PC
+For controlling the robot with a joystick, launch the joy_control.launch.py file and optionally start the multiplexer:
 
 ```bash
-ros2 launch roboost mecanum_tf_broadcast.launch.py
-
-rviz2
-
 ros2 launch roboost joy_control.launch.py
+ros2 run twist_mux twist_mux --ros-args --params-file ./src/roboost/config/twist_mux.yaml -r cmd_vel_out:=cmd_vel
 ```
+
+#### Mapping with SLAM Toolbox
+
+To start mapping, launch the slam toolbox using the provided config:
+
+```bash
+ros2 launch slam_toolbox online_async_launch.py params_file:=./src/roboost/config/stb_mapping.yaml
+```
+
+The map can be saved within rviz2 by going to Panels -> Add New Panel -> slam_toolbox -> SlamToolboxPlugin. Then you can save the map in the old .pgm format by clicking the "Save Map" button (after giving it a name), or you can save it in the new .yaml format by clicking the "Serialize Map" button (after giving it a name). The map will be saved in the folder where you launched rviz2.
+
+For localization, you can use the stb_localization.yaml config file, however I would recommend using the AMCL package instead.
+
+#### Localization with Nav2
+
+Once you have a map, you can stop the slam_toolbox node and start the amcl localization node like this (use_sim_time optionally):
+
+```bash
+ros2 launch nav2_bringup localization_launch.py map:=./src/roboost/maps/home_sim_map.yaml use_sim_time:=true
+```
+
+This will start the amcl localization node and the map_server node. Now you can vizualize the map in rviz2 by adding the corresponding topic (usually you also have to set the Durability Policy to Transient Local). You will also need to set the initial pose of the robot in rviz2. This can be done by clicking the "2D Pose Estimate" button and then clicking on the map where the robot is located. The robot will then start localizing itself on the map.
+
+#### Navigation with Nav2
+
+Once you have a map and the robot is localized, you can start the navigation stack like this:
+
+```bash
+ros2 launch nav2_bringup navigation_launch.py map:=./src/roboost/maps/home_sim_map.yaml use_sim_time:=true map_subscribe_transient_local:=true
+```
+
+Now you can send a goal to the robot using rviz2. This can be done by clicking the "2D Nav Goal" button and then clicking on the map where you want the robot to go. The robot will then start navigating to the goal. Note that the costmaps can now also be visualized in rviz2.
 
 ### Timescale Connector
 
