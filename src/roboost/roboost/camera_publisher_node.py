@@ -21,6 +21,10 @@ class CameraPublisher(Node):
         self.cap = cv2.VideoCapture(1)
 
     def timer_callback(self):
+        """
+        Publishes the image from the camera.
+        :return: None
+        """
         ret, frame = self.cap.read()
         if ret:
             # Resize the frame to a lower resolution, e.g., 640x480

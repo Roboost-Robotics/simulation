@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import rclpy
 from rclpy.node import Node
 import yaml
@@ -15,6 +17,10 @@ class TimescaleDBLogger(Node):
         self.create_subscriptions()
 
     def read_config(self):
+        """
+        Read the configuration file.
+        :return: None
+        """
         package_share_directory = get_package_share_directory("roboost")
         conf_file = os.path.join(package_share_directory, "config", "timescale.yaml")
         with open(conf_file, "r") as file:
@@ -23,6 +29,10 @@ class TimescaleDBLogger(Node):
         self.topics = config["topics"]
 
     def establish_db_connection(self):
+        """
+        Establish a connection to the database.
+        :return: None
+        """
         self.conn = psycopg2.connect(
             host=self.db_config["host"],
             port=self.db_config["port"],
@@ -33,6 +43,10 @@ class TimescaleDBLogger(Node):
         self.cursor = self.conn.cursor()
 
     def create_subscriptions(self):
+        """
+        Create subscriptions to the topics specified in the configuration file.
+        :return: None
+        """
         for topic, topic_config in self.topics.items():
             module_name, class_name = topic_config["msg_type"].rsplit(".", 1)
             module = __import__(module_name, fromlist=[class_name])
@@ -53,48 +67,73 @@ class TimescaleDBLogger(Node):
             )
 
     def topic_callback(self, msg, topic):
+        """
+        Callback function for the subscribed topics.
+        :param msg: Message received.
+        :param topic: ROS topic name.
+        :return: None
+        """
         table_name = topic.replace("/", "_").lstrip("_")
         table_structure = self.topics[topic]["table_structure"]
 
-        # Extracting data from the message based on table structure
         msg_data = []
         for column in table_structure:
-            column_name = column["column_name"]
-            if hasattr(msg, column_name):
-                value = getattr(msg, column_name)
-                # Here you might need to convert the value based on its type
-                # For example, if it's a complex type, you might need to serialize it
+            column_name = column["column_name"].replace("_", ".")
+            attr_parts = column_name.split(".")
+            value = msg
+            for part in attr_parts:
+                if hasattr(value, part):
+                    value = getattr(value, part)
+                else:
+                    self.get_logger().warn(
+                        f"Attribute '{part}' not found in message for topic '{topic}'"
+                    )
+                    value = None
+                    break
+            if value is not None:
+                # Convert numpy arrays and lists to PostgreSQL array format
+                if isinstance(value, list) or isinstance(value, np.ndarray):
+                    value = list_to_db_format_function(value)
                 msg_data.append(value)
-            else:
-                self.get_logger().warn(
-                    f"Column '{column_name}' not found in message for topic '{topic}'"
-                )
 
-        # Only proceed if msg_data matches the number of columns (excluding 'id' and 'time')
         if len(msg_data) == len(table_structure):
-            self.insert_into_table(table_name, msg_data)
+            self.insert_into_table(table_name, topic, msg_data)
         else:
             self.get_logger().error(
                 f"Mismatch in number of data fields for topic '{topic}'"
             )
 
-    def insert_into_table(self, table_name, msg_data):
-        # Constructing the column names and placeholders for SQL
+    def insert_into_table(self, table_name, topic, msg_data):
+        """
+        Insert a message into a table.
+        :param table_name: Name of the table to insert into.
+        :param topic: ROS topic name.
+        :param msg_data: Data to be inserted into the table.
+        :return: None
+        """
+        # Get the column names from the configuration
         columns = [col["column_name"] for col in self.topics[topic]["table_structure"]]
-        placeholders = ", ".join(["%s"] * len(columns))
-        columns_sql = ", ".join(columns)
 
+        # Construct the column names and placeholders for SQL
+        columns_sql = ", ".join(columns)
+        placeholders = ", ".join(["%s"] * len(columns))
+
+        # Execute the INSERT statement
         self.cursor.execute(
             sql.SQL(
-                f"""
-            INSERT INTO {table_name} ({columns_sql}) VALUES ({placeholders})
-        """
+                f"INSERT INTO {table_name} ({columns_sql}) VALUES ({placeholders})"
             ),
             msg_data,
         )
         self.conn.commit()
 
     def create_table_if_not_exists(self, table_name, table_structure):
+        """
+        Create a table in the database if it doesn't exist.
+        :param table_name: Name of the table to be created.
+        :param table_structure: A list of dictionaries containing the column name and type.
+        :return: None
+        """
         columns_sql = ", ".join(
             [f"{col['column_name']} {col['column_type']}" for col in table_structure]
         )
@@ -108,17 +147,6 @@ class TimescaleDBLogger(Node):
             )
         """
             )
-        )
-        self.conn.commit()
-
-    def insert_into_table(self, table_name, msg_data):
-        self.cursor.execute(
-            sql.SQL(
-                f"""
-        INSERT INTO {table_name} (data) VALUES (%s)
-        """
-            ),
-            [msg_data],
         )
         self.conn.commit()
 
@@ -139,3 +167,15 @@ def main(args=None):
 
 if __name__ == "main":
     main()
+
+
+def list_to_db_format_function(value):
+    """
+    Converts a Python list or numpy array to a PostgreSQL array format.
+    :param value: List or numpy array to be converted.
+    :return: A string representing the PostgreSQL array.
+    """
+    if isinstance(value, np.ndarray):
+        value = value.tolist()
+
+    return "{" + ",".join([str(element) for element in value]) + "}"

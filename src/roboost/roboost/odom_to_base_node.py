@@ -14,6 +14,11 @@ class OdomToBaseLinkTfNode(Node):
         self.create_subscription(Odometry, "/odom", self.odom_callback, 10)
 
     def odom_callback(self, msg):
+        """
+        Callback function for the /odom topic.
+        :param msg: Odometry message
+        :return: None
+        """
         transform_stamped = TransformStamped()
         transform_stamped.header.stamp = self.get_clock().now().to_msg()
         transform_stamped.header.frame_id = "odom"

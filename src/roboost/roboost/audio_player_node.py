@@ -17,6 +17,11 @@ class AudioPlayer(Node):
         self.last_state = False
 
     def joy_callback(self, msg):
+        """
+        Callback function for the /joy topic.
+        :param msg: Joy message
+        :return: None
+        """
         current_state = (
             msg.buttons[0] == 1
         )  # Check if 'A' button (first button) is pressed
@@ -27,6 +32,10 @@ class AudioPlayer(Node):
         self.last_state = current_state
 
     def play_random_sound(self):
+        """
+        Play a random sound from the audio directory.
+        :return: None
+        """
         if os.path.exists(self.audio_directory) and os.path.isdir(self.audio_directory):
             files = [f for f in os.listdir(self.audio_directory) if f.endswith(".ogg")]
             if files:
