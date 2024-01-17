@@ -120,7 +120,7 @@ ros2 launch slam_toolbox online_async_launch.py params_file:=./src/roboost/confi
 
 The map can be saved within rviz2 by going to Panels -> Add New Panel -> slam_toolbox -> SlamToolboxPlugin. Then you can save the map in the old .pgm format by clicking the "Save Map" button (after giving it a name), or you can save it in the new .yaml format by clicking the "Serialize Map" button (after giving it a name). The map will be saved in the folder where you launched rviz2.
 
-For localization, you can use the stb_localization.yaml config file, however I would recommend using the AMCL package instead.
+For localization, you can use the stb_localization.yaml config file, however I would recommend using the Nav2 package instead.
 
 #### Localization with Nav2
 
