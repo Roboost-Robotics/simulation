@@ -9,6 +9,9 @@ from psycopg2 import sql
 from ament_index_python import get_package_share_directory
 
 
+# TODO
+#  - 1 timestamp from the message itself, 1 timestamp from the database
+#  - nested messages
 class TimescaleDBLogger(Node):
     def __init__(self):
         super().__init__("timescale_logger")
@@ -54,9 +57,9 @@ class TimescaleDBLogger(Node):
 
             # Create the table for the topic if it doesn't exist
             table_name = topic.replace("/", "_").lstrip("_")
-            if "table_structure" in topic_config:
+            if "msg_structure" in topic_config:
                 self.create_table_if_not_exists(
-                    table_name, topic_config["table_structure"]
+                    table_name, topic_config["msg_structure"]
                 )
 
             self.create_subscription(
@@ -74,12 +77,12 @@ class TimescaleDBLogger(Node):
         :return: None
         """
         table_name = topic.replace("/", "_").lstrip("_")
-        table_structure = self.topics[topic]["table_structure"]
+        table_structure = self.topics[topic]["msg_structure"]
 
         msg_data = []
         for column in table_structure:
-            column_name = column["column_name"].replace("_", ".")
-            attr_parts = column_name.split(".")
+            column_name = column["msg_value"]
+            attr_parts = column_name.split("/")
             value = msg
             for part in attr_parts:
                 if hasattr(value, part):
@@ -91,7 +94,6 @@ class TimescaleDBLogger(Node):
                     value = None
                     break
             if value is not None:
-                # Convert numpy arrays and lists to PostgreSQL array format
                 if isinstance(value, list) or isinstance(value, np.ndarray):
                     value = list_to_db_format_function(value)
                 msg_data.append(value)
@@ -99,9 +101,35 @@ class TimescaleDBLogger(Node):
         if len(msg_data) == len(table_structure):
             self.insert_into_table(table_name, topic, msg_data)
         else:
-            self.get_logger().error(
-                f"Mismatch in number of data fields for topic '{topic}'"
+            self.get_logger().warn(
+                f"Message for topic '{topic}' does not contain all the required attributes. Message is:\n{msg_data}\nTable structure is:\n{table_structure}"
             )
+
+    def create_table_if_not_exists(self, table_name, table_structure):
+        """
+        Create a table in the database if it doesn't exist.
+        :param table_name: Name of the table to be created.
+        :param table_structure: A list of dictionaries containing the column name and type.
+        :return: None
+        """
+        columns_sql = ", ".join(
+            [
+                f"{col['msg_value'].replace('/', '_')} {col['column_type']}"
+                for col in table_structure
+            ]
+        )
+        self.cursor.execute(
+            sql.SQL(
+                f"""
+                CREATE TABLE IF NOT EXISTS {table_name} (
+                    id SERIAL PRIMARY KEY,
+                    {columns_sql},
+                    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+        )
+        self.conn.commit()
 
     def insert_into_table(self, table_name, topic, msg_data):
         """
@@ -111,8 +139,11 @@ class TimescaleDBLogger(Node):
         :param msg_data: Data to be inserted into the table.
         :return: None
         """
-        # Get the column names from the configuration
-        columns = [col["column_name"] for col in self.topics[topic]["table_structure"]]
+        # Get the column names from the configuration and replace dots with underscores
+        columns = [
+            col["msg_value"].replace("/", "_")
+            for col in self.topics[topic]["msg_structure"]
+        ]
 
         # Construct the column names and placeholders for SQL
         columns_sql = ", ".join(columns)
@@ -124,29 +155,6 @@ class TimescaleDBLogger(Node):
                 f"INSERT INTO {table_name} ({columns_sql}) VALUES ({placeholders})"
             ),
             msg_data,
-        )
-        self.conn.commit()
-
-    def create_table_if_not_exists(self, table_name, table_structure):
-        """
-        Create a table in the database if it doesn't exist.
-        :param table_name: Name of the table to be created.
-        :param table_structure: A list of dictionaries containing the column name and type.
-        :return: None
-        """
-        columns_sql = ", ".join(
-            [f"{col['column_name']} {col['column_type']}" for col in table_structure]
-        )
-        self.cursor.execute(
-            sql.SQL(
-                f"""
-            CREATE TABLE IF NOT EXISTS {table_name} (
-                id SERIAL PRIMARY KEY,
-                {columns_sql},
-                time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """
-            )
         )
         self.conn.commit()
 
