@@ -127,7 +127,7 @@ For localization, you can use the stb_localization.yaml config file, however I w
 Once you have a map, you can stop the slam_toolbox node and start the amcl localization node like this (use_sim_time optionally):
 
 ```bash
-ros2 launch nav2_bringup localization_launch.py map:=./src/roboost/maps/home_sim_map.yaml use_sim_time:=true
+ros2 launch roboost localization_launch.py map:=./src/roboost/maps/home_map.yaml params_file:=./src/roboost/config/nav2_params.yaml #use_sim_time:=true
 ```
 
 This will start the amcl localization node and the map_server node. Now you can vizualize the map in rviz2 by adding the corresponding topic (usually you also have to set the Durability Policy to Transient Local). You will also need to set the initial pose of the robot in rviz2. This can be done by clicking the "2D Pose Estimate" button and then clicking on the map where the robot is located. The robot will then start localizing itself on the map.
@@ -137,7 +137,7 @@ This will start the amcl localization node and the map_server node. Now you can 
 Once you have a map and the robot is localized, you can start the navigation stack like this:
 
 ```bash
-ros2 launch nav2_bringup navigation_launch.py map:=./src/roboost/maps/home_sim_map.yaml use_sim_time:=true map_subscribe_transient_local:=true
+ros2 launch roboost navigation_launch.py map:=./src/roboost/maps/home_map.yaml map_subscribe_transient_local:=true params_file:=./src/roboost/config/nav2_params.yaml #use_sim_time:=true
 ```
 
 Now you can send a goal to the robot using rviz2. This can be done by clicking the "2D Nav Goal" button and then clicking on the map where you want the robot to go. The robot will then start navigating to the goal. Note that the costmaps can now also be visualized in rviz2.
@@ -150,6 +150,22 @@ To run the Timescale Connector, run the following command:
 
 ```bash
 ros2 run roboost timescale_connector
+```
+
+### Image Streamer
+
+To publish a video stream to the /camera topic, run the following command:
+
+```bash
+ros2 run roboost image_publisher <video source number>
+```
+
+This will utalize the image_transport package to publish the video stream to the /camera topic.
+
+To view the video stream, run the following command:
+
+```bash
+ros2 run roboost image_stream --ros-args -p _image_transport:=compressed
 ```
 
 ## TODO

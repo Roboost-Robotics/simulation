@@ -32,6 +32,9 @@ private:
     if (cap_.read(frame)) {
       // Check if grabbed frame is actually full with some content
       if (!frame.empty()) {
+        // Rotate frame 180 degrees
+        cv::flip(frame, frame, -1);
+
         auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", frame)
                        .toImageMsg();
         publisher_.publish(msg);
