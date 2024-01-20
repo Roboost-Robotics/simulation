@@ -24,7 +24,7 @@ def generate_launch_description():
         executable="teleop_node",
         name="teleop_node",
         parameters=[{"use_sim_time": use_sim_time}, joy_params],
-        remappings=[("/cmd_vel", "/cmd_vel_joy")],
+        remappings=[("/cmd_vel", "/cmd_vel_joy")],  # Corrected syntax
     )
 
     twist_mux_params = os.path.join(
@@ -36,7 +36,7 @@ def generate_launch_description():
         executable="twist_mux",
         name="twist_mux",
         parameters=[{"use_sim_time": use_sim_time}, twist_mux_params],
-        remappings=[{"cmd_vel_out": "/cmd_vel"}],
+        remappings=[("cmd_vel_out", "/cmd_vel")],  # Corrected syntax
     )
 
     return LaunchDescription(

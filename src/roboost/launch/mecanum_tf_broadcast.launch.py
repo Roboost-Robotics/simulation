@@ -39,7 +39,7 @@ def generate_launch_description():
 
     odom_to_base_node = Node(
         package="roboost",
-        executable="odom_to_base",
+        executable="odom_to_base_node.py",
         name="odom_to_base",
         output="screen",
         parameters=[
