@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 import os
-
 import numpy as np
 import rclpy
 from rclpy.node import Node
@@ -9,12 +9,10 @@ from psycopg2 import sql
 from ament_index_python import get_package_share_directory
 
 
-# TODO
-#  - 1 timestamp from the message itself, 1 timestamp from the database
-#  - nested messages
+# TODO timestamp from the message itself, 1 timestamp from the database
 class TimescaleDBLogger(Node):
     def __init__(self):
-        super().__init__("timescale_logger")
+        super().__init__("timescale_connector")
         self.read_config()
         self.establish_db_connection()
         self.create_subscriptions()
@@ -166,14 +164,14 @@ class TimescaleDBLogger(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = TimescaleDBLogger()
+    print("Spinning timescale logger node")
     rclpy.spin(node)
-
     node.close_db_connection()
     node.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()
 
 

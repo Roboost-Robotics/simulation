@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import random
 import subprocess
@@ -10,6 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 class AudioPlayer(Node):
     def __init__(self):
         super().__init__("audio_player_node")
+        print("Initializing audio player node")
 
         self.subscription = self.create_subscription(Joy, "/joy", self.joy_callback, 10)
         package_share_directory = get_package_share_directory("roboost")
@@ -62,6 +64,7 @@ class AudioPlayer(Node):
 def main(args=None):
     rclpy.init(args=args)
     audio_player_node = AudioPlayer()
+    print("Spinning audio player node. Press 'A' on the controller to play a sound")
     rclpy.spin(audio_player_node)
     audio_player_node.destroy_node()
     rclpy.shutdown()
