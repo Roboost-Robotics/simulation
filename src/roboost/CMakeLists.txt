@@ -43,6 +43,7 @@ install(PROGRAMS
   scripts/camera_publisher_node.py
   scripts/audio_player_node.py
   scripts/timescale_connector_node.py
+  scripts/movement_pattern_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
